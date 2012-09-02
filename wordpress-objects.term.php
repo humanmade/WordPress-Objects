@@ -10,6 +10,16 @@ class Term {
 	 */
 	protected static $taxonomy = null;
 
+
+	public static function get_by_name( $slug, $taxonomy = null ) {
+
+		$term = get_term_by( 'name', $slug, $taxonomy ? $taxonomy : static::$taxonomy );
+
+		$class = get_called_class();
+
+		return new $class( $term->term_id, $taxonomy ? $taxonomy : static::$taxonomy );
+	}
+
 	public static function get_by_slug( $slug, $taxonomy = null ) {
 
 		$term = get_term_by( 'slug', $slug, $taxonomy ? $taxonomy : static::$taxonomy );
@@ -45,8 +55,7 @@ class Term {
 	 */
 	public function is_queried_object() {
 
-		if ( function_exists( 'hm_is_queried_object' ) )
-			return hm_is_queried_object( $this->_term );
+		return hm_is_queried_object( $this->_term );
 
 	}
 
@@ -62,89 +71,43 @@ class Term {
 		return null;
 	}
 
-	/**
-	 * Get the taxonomy this term is in
-	 * 
-	 * @return string
-	 */
 	public function get_taxonomy() {
 
 		return $this->_term->taxonomy;
 	}
 
-	/**
-	 * Get meta date for this term
-	 * 
-	 * @param  string  $key
-	 * @param  boolean $single default false
-	 * @return array|mixed
-	 */
 	public function get_meta( $key, $single = false ) {
 		return get_term_meta( $this->get_id(), $key, $single );
 	}
 
-	/**
-	 * Update meta data for this term
-	 * 
-	 * @param  string $key
-	 * @param  mixed $value
-	 */
 	public function update_meta( $key, $value ) {
 		return update_term_meta( $this->get_id(), $key, $value );
 	}
 
-	/**
-	 * Add meta data for this term
-	 * 
-	 * @param  string $key
-	 * @param  mixed $value
-	 */
 	public function add_meta( $key, $value ) {
 		return add_term_meta( $this->get_id(), $key, $value );
 	}
 
-	/**
-	 * Delete meta data for this term
-	 * 
-	 * @param  string $key
-	 * @param  mixed $value
-	 */
 	public function delete_meta( $key, $value = null ) {
 		return delete_term_meta( $this->get_id(), $key, $value );
 	}
 
-	/**
-	 * Get the slug for this term
-	 * 
-	 * @return string
-	 */
 	public function get_slug() {
 		return $this->_term->slug;
 	}
 
-	/**
-	 * Get the name for this term
-	 * 
-	 * @return string
-	 */
 	public function get_name() {
 		return $this->_term->name;
 	}
 
-	/**
-	 * Get the WordPressnative term object
-	 * 
-	 * @return StdClass
-	 */
+	public function set_name( $name ) {
+		wp_update_term( $this->get_id(), $this->get_taxonomy(), array( 'name' => $name ) );
+	}
+
 	public function get_term() {
 		return $this->_term;
 	}
 
-	/**
-	 * Get the term_taxonomy_id for this term
-	 * 
-	 * @return int
-	 */
 	public function get_term_taxonomy_id() {
 		return $this->_term->term_taxonomy_id;
 	}

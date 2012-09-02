@@ -124,60 +124,31 @@ class Post {
 		return date( $format, strtotime( $this->_post->post_date ) );
 	}
 
-	/**
-	 * Get meta date for the post
-	 * @param  string  $key
-	 * @param  boolean $single default false. Whether there is only one entry
-	 * @return array|mixed
-	 */
 	public function get_meta( $key, $single = false ) {
 		return get_post_meta( $this->get_id(), $key, $single );
 	}
 
-	/**
-	 * Update meta data for the post
-	 * @param  string $key
-	 * @param  mixed $value
-	 */
 	public function update_meta( $key, $value ) {
 		return update_post_meta( $this->get_id(), $key, $value );
 	}
 
-	/**
-	 * Add meta data for the post
-	 * 
-	 * @param string $key  
-	 * @param mixed $value
-	 */
 	public function add_meta( $key, $value ) {
 		return add_post_meta( $this->get_id(), $key, $value );
 	}
 
-	/**
-	 * Delete meta date for this post
-	 * 
-	 * @param  string $key
-	 * @param  mixed  $value 
-	 */
 	public function delete_meta( $key, $value = null ) {
 		return delete_post_meta( $this->get_id(), $key, $value );
 	}
 
-	/**
-	 * Get the title of the post
-	 * 
-	 * @return string
-	 */
+	public function delete() {
+		wp_delete_post( $this->get_id(), true );
+	}
+
 	public function get_title() {
 
 		return get_the_title( $this->get_id() );
 	}
 
-	/**
-	 * Get the content of the post
-	 * 
-	 * @return string
-	 */
 	public function get_content() {
 
 		if ( ! isset( $this->_content ) ) {
@@ -193,21 +164,10 @@ class Post {
 		return $this->_content;
 	}
 
-	/**
-	 * Get the unfiltered content of the post
-	 * 
-	 * @return string
-	 */
 	public function get_raw_content() {
 		return $this->_post->post_content;
 	}
 
-	/**
-	 * Get the author of this post
-	 * 
-	 * @todo  return User object instead
-	 * @return int
-	 */
 	public function get_author() {
 
 		if ( $this->_post->post_author )
@@ -216,21 +176,10 @@ class Post {
 		return null;
 	}
 
-	/**
-	 * Get the permalink for the post
-	 * 
-	 * @return string
-	 */
 	public function get_permalink() {
 		return get_permalink( $this->get_id() );
 	}
 
-	/**
-	 * Get the excerpt of the current post
-	 * 
-	 * @todo  add params for the_excerpt()
-	 * @return string
-	 */
 	public function get_excerpt() {
 
 		if ( ! isset( $this->_excerpt ) ) {
@@ -247,29 +196,14 @@ class Post {
 
 	}
 
-	/**
-	 * Get the count of comments on this post
-	 * 
-	 * @return int
-	 * @todo  implement
-	 */
 	public function get_comment_count() {
 
 	}
 
-	/**
-	 * Get teh status of this post
-	 * 
-	 * @return string
-	 */
 	public function get_status() {
 		return $this->_post->post_status;
 	}
 
-	/**
-	 * Set the status of this post
-	 * 
-	 */
 	public function set_status( $status ) {
 
 		$this->_post->post_status = $status;
@@ -296,39 +230,6 @@ class Post {
 			throw new Exception( 'wp_insert_post failed: ' . $result );
 
 		return $result;
-	}
-
-
-	public function get_facebook_share_url() {
-
-		return add_query_arg(
-			array(
-				'u'	=> $this->get_permalink(),
-				't' => $this->get_title()
-			), 
-			'http://www.facebook.com/sharer.php'
-		);
-	}
-
-	public function get_tweet_url() {
-
-		return add_query_arg(
-			array(
-				'url'	=> $this->get_permalink()
-			), 
-			'https://twitter.com/share'
-		);
-	}
-
-	public function get_tumblr_share_url() {
-
-		return add_query_arg(
-			array(
-				'url'	=> urlencode( $this->get_permalink() ),
-				'name' 	=> $this->get_title()
-			), 
-			'http://www.tumblr.com/share/link'
-		);
 	}
 
 }

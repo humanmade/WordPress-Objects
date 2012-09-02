@@ -20,6 +20,7 @@ class User {
 			throw new Exception( 'User is not logged in' );
 	}
 
+
 	public static function get( $id ) {
 		if ( ! isset( self::$users[$id] ) )
 			self::$users[$id] = new User( $id );
@@ -31,11 +32,14 @@ class User {
 	 * @param int $user_id
 	 */
 	public function __construct( $user_id ) {
-		
+
 		if ( empty( $user_id ) )
 			throw new Exception( '$user_id empty' );
 
 		$this->_id = $user_id;
+
+		if ( ! $this->get_user() )
+			throw new Exception( '$user_id does not exist' );
 	}
 
 	/**
@@ -49,13 +53,17 @@ class User {
 
 	/**
 	 * Get the WordPress WP_User object
-	 * 
 	 * @return WP_User
 	 */
 	public function get_user() {
 
 		if ( ! isset( $this->_user ) )
 			$this->_user = new WP_User( $this->_id );
+
+		if ( ! $this->_user->ID ) {
+			unset( $this->_user );
+			return null;
+		}
 
 		return $this->_user;
 	}
@@ -151,9 +159,10 @@ class User {
 	 * Get the avatar <img> tag for the user
 	 *
 	 * @param string|array $size
+	 * @param mixed $attr
 	 * @return string
 	 */
-	public function get_avatar_img( $size ) {
+	public function get_avatar_img( $size, $attr = array() ) {
 
 		if ( ! isset( $this->_avatar_imgs[ $key = serialize($size)] ) ) {
 
@@ -171,7 +180,14 @@ class User {
 			else
 				$size = array( '', '' );
 
-			$this->_avatar_imgs[$key] = '<img src="' . $url . '" width="' . $size[0] . '" height="' . $size[1] . '" class="avatar" />';
+			$attr = wp_parse_args( $attr, array( 'width' => $size[0], 'height' => $size[1], 'class' => 'avatar' ) );
+
+			$attr_string  = '';
+
+			foreach ( $attr as $att => $val)
+				$attr_string .= ' ' . $att . '="' . $val . '"';
+
+			$this->_avatar_imgs[$key] = '<img src="' . $url . '"' . $attr_string . ' />';
 		}
 
 		return $this->_avatar_imgs[$key];
@@ -184,6 +200,17 @@ class User {
 	 */
 	public function get_role() {
 		return reset( $this->get_user()->roles );
+	}
+
+	/**
+	 * Get the notification setting for the user
+	 *
+	 * @param string $setting
+	 * @return mixed
+	 */
+	public function get_notification_setting( $setting ) {
+
+		return $this->get_user()->user_notification_settings[$setting];
 	}
 
 	/**
@@ -218,4 +245,17 @@ class User {
 	public function add_meta( $key, $value ) {
 		return add_user_meta( $this->get_id(), $key, $value );
 	}
+
+	/**
+	 * Delete a meta key=>value for the user
+	 *
+	 * @param string $key
+	 * @param mixed $value optional
+	 * @return bool
+	 */
+	public function delete_meta( $key, $value = '' ) {
+		return delete_user_meta( $this->get_id(), $key, $value );
+	}
+
+
 }
