@@ -200,6 +200,10 @@ class Post {
 
 	}
 
+	public function get_post_type() {
+		return $this->_post->post_type;
+	}
+
 	public function get_status() {
 		return $this->_post->post_status;
 	}
