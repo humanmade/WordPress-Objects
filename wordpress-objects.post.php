@@ -149,6 +149,10 @@ class Post {
 		return get_the_title( $this->get_id() );
 	}
 
+	public function get_post_name() {
+		return $this->_post->post_name;
+	}
+
 	public function get_content() {
 
 		if ( ! isset( $this->_content ) ) {
@@ -198,6 +202,10 @@ class Post {
 
 	public function get_comment_count() {
 
+	}
+
+	public function get_post_type() {
+		return $this->_post->post_type;
 	}
 
 	public function get_status() {
