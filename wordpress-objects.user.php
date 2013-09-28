@@ -222,7 +222,7 @@ class User {
 	 * @param bool $single
 	 * @return mixed
 	 */
-	public function get_meta( $key, $single = false ) {
+	public function get_meta( $key = '', $single = false ) {
 		return get_user_meta( $this->get_id(), $key, $single );
 	}
 
