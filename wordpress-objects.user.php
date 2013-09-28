@@ -22,8 +22,10 @@ class User {
 
 
 	public static function get( $id ) {
-		if ( ! isset( self::$users[$id] ) )
-			self::$users[$id] = new User( $id );
+		if ( ! isset( self::$users[$id] ) ) {
+			$class = get_called_class();
+			self::$users[$id] = new $class( $id );
+		}
 
 		return self::$users[$id];
 	} 
