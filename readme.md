@@ -1,14 +1,3 @@
-WordPress-Objects
-=================
+## Contribution guidelines ##
 
-## primary-contact  
- 
-Joe Hoyle  
-
-@joehoyle 
-
-## secondary-contact 
- 
--  
- 
--
+see https://github.com/humanmade/WordPress-Objects/blob/master/CONTRIBUTING.md
