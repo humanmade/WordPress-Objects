@@ -244,7 +244,7 @@ class Post {
 		wp_get_post_terms( $this->get_id(), $taxonomy, $args );
 	}
 
-	public function set_terms( $tags, $taxonomy, $append = array() ) {
+	public function set_terms( $tags, $taxonomy, $append = false ) {
 		wp_set_post_terms( $this->get_id(), $tags, $taxonomy, $append );
 	}
 
