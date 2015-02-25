@@ -250,27 +250,63 @@ class Post {
 	public function get_terms( $taxonomy, $args = array() ) {
 		return array_map(
 			function( $term ) use ( $taxonomy ) {
-				return Term::get_by_slug( $term['slug'], $taxonomy );
+				try {
+					return Term::get_by_slug( $term['slug'], $taxonomy );
+				} catch ( Exception $e ) {
+					return null;
+				}
 			},
 			wp_get_post_terms( $this->get_id(), $taxonomy, $args )
 		);
 	}
 
 	/**
-	 * Set the terms for a post.
+	 * Add terms to a post.
 	 *
-	 * @param string $tags     Optional. The tags to set for the post, separated by commas. Default empty.
-	 * @param string $taxonomy Optional. Taxonomy name. Default 'post_tag'.
-	 * @param bool   $append   Optional. If true, don't delete existing tags, just add on. If false,
-	 *                         replace the tags with the new tags. Default false.
-	 * @return mixed Array of affected term IDs. WP_Error or false on failure.
+	 * @param array $terms Term objects
 	 */
-	public function set_terms( $tags, $taxonomy, $append = false ) {
-		return wp_set_post_terms( $this->get_id(), $tags, $taxonomy, $append );
+	public function add_terms( $terms ) {
+		foreach ( $terms as $term ) {
+			$this->set_term( $term );
+		}
 	}
 
-	public function has_term( $term = '', $taxonomy = '' ) {
-		return has_term( $term, $taxonomy, $this->get_id() );
+	/**
+	 * Add a single term to a post.
+	 *
+	 * @param Term $terms Term Object
+	 */
+	public function add_term( $term ) {
+		return wp_set_post_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy(), true );
+	}
+
+	/**
+	 * Reset terms.
+	 * Will delete all terms for a given taxonomy.
+	 * Adds all passed terms or  overwrite existing terms,
+	 *
+	 * @param  array  $terms Term
+	 * @param  string  $terms Tax
+	 * @return null
+	 */
+	public function reset_terms( $taxonomy, $terms = array() ) {
+
+		wp_set_post_terms( $this->get_id(), array(), $taxonomy, false );
+
+		if ( ! empty( $terms ) ) {
+			$this->add_terms( $terms );
+		}
+
+	}
+
+	/**
+	 * Is post associated with term?
+	 *
+	 * @param  Term $term
+	 * @return boolean
+	 */
+	public function has_term( $term ) {
+		return has_term( $term->get_slug(), $term->get_taxonomy(), $this->get_id() );
 	}
 
 }
