@@ -248,7 +248,12 @@ class Post {
 	 * @return array List of post tags.
 	 */
 	public function get_terms( $taxonomy, $args = array() ) {
-		return wp_get_post_terms( $this->get_id(), $taxonomy, $args );
+		return array_map(
+			function( $term ) use ( $taxonomy ) {
+				return Term::get_by_slug( $term['slug'], $taxonomy );
+			},
+			wp_get_post_terms( $this->get_id(), $taxonomy, $args )
+		);
 	}
 
 	/**
