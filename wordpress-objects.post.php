@@ -9,7 +9,7 @@ class Post {
 	 * @throws Exception
 	 */
 	public function __construct( $post_id ) {
-		
+
 		if ( empty( $post_id ) )
 			throw new Exception( '$post_id empty' );
 
@@ -20,7 +20,7 @@ class Post {
 	}
 
 	public function __get( $name ) {
-	
+
 		if ( in_array( $name, array( 'post_name', 'post_title', 'ID', 'post_author', 'post_type', 'post_status'  ) ) )
 			throw new Exception( 'Trying to access wp_post object properties from Post object' );
 	}
@@ -238,6 +238,18 @@ class Post {
 			throw new Exception( 'wp_insert_post failed: ' . $result );
 
 		return $result;
+	}
+
+	public function get_terms( $taxonomy, $args = array() ) {
+		wp_get_post_terms( $this->get_id(), $taxonomy, $args );
+	}
+
+	public function set_terms( $tags, $taxonomy, $append = array() ) {
+		wp_set_post_terms( $this->get_id(), $tags, $taxonomy, $append );
+	}
+
+	public function has_term( $term = '', $taxonomy = '' ) {
+		return has_term( $term, $taxonomy, $this->get_id() );
 	}
 
 }
