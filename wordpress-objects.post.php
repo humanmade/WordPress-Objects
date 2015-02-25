@@ -240,12 +240,28 @@ class Post {
 		return $result;
 	}
 
+	/**
+	 * Retrieve the terms for a post.
+	 *
+	 * @param string $taxonomy Optional. The taxonomy for which to retrieve terms. Default 'post_tag'.
+	 * @param array  $args     Optional. {@link wp_get_object_terms()} arguments. Default empty array.
+	 * @return array List of post tags.
+	 */
 	public function get_terms( $taxonomy, $args = array() ) {
-		wp_get_post_terms( $this->get_id(), $taxonomy, $args );
+		return wp_get_post_terms( $this->get_id(), $taxonomy, $args );
 	}
 
+	/**
+	 * Set the terms for a post.
+	 *
+	 * @param string $tags     Optional. The tags to set for the post, separated by commas. Default empty.
+	 * @param string $taxonomy Optional. Taxonomy name. Default 'post_tag'.
+	 * @param bool   $append   Optional. If true, don't delete existing tags, just add on. If false,
+	 *                         replace the tags with the new tags. Default false.
+	 * @return mixed Array of affected term IDs. WP_Error or false on failure.
+	 */
 	public function set_terms( $tags, $taxonomy, $append = false ) {
-		wp_set_post_terms( $this->get_id(), $tags, $taxonomy, $append );
+		return wp_set_post_terms( $this->get_id(), $tags, $taxonomy, $append );
 	}
 
 	public function has_term( $term = '', $taxonomy = '' ) {
