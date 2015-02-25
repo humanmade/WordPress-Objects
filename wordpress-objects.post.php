@@ -275,9 +275,10 @@ class Post {
 	 * Add a single term to a post.
 	 *
 	 * @param Term $terms Term Object
+	 * @return array|WP_Error Affected Term IDs.
 	 */
 	public function add_term( $term ) {
-		return wp_set_post_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy(), true );
+		return wp_set_object_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy(), true );
 	}
 
 	/**
