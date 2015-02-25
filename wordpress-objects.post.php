@@ -287,15 +287,23 @@ class Post {
 	 *
 	 * @param  array  $terms Term
 	 * @param  string  $terms Tax
-	 * @return null
+	 * @return array|WP_Error Affected Term IDs.
 	 */
 	public function reset_terms( $taxonomy, $terms = array() ) {
 
-		wp_set_post_terms( $this->get_id(), array(), $taxonomy, false );
+		// Filter terms to ensure they are in the correct taxonomy
+		$terms = array_filter( $terms, function( $term ) use ( $taxonomy ) {
+			return $term->get_taxonomy() === $taxonomy;
+		} );
 
-		if ( ! empty( $terms ) ) {
-			$this->add_terms( $terms );
-		}
+		// get array of term IDs
+		$terms = array_map( function( $term ) {
+			return $term->get_id();
+		}, $terms );
+
+		return wp_set_object_terms( $this->get_id(), $terms, $taxonomy, false );
+
+	}
 
 	/**
 	 * Remove a post term.
