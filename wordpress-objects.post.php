@@ -267,7 +267,7 @@ class Post {
 	 */
 	public function add_terms( $terms ) {
 		foreach ( $terms as $term ) {
-			$this->set_term( $term );
+			$this->add_term( $term );
 		}
 	}
 
