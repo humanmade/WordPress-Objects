@@ -297,6 +297,14 @@ class Post {
 			$this->add_terms( $terms );
 		}
 
+	/**
+	 * Remove a post term.
+	 *
+	 * @param  Term $term.
+	 * @return bool|WP_Error True on success, false or WP_Error on failure.
+	 */
+	public function remove_term( $term ) {
+		return wp_remove_object_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy() );
 	}
 
 	/**
