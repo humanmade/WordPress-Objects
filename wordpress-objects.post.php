@@ -248,24 +248,92 @@ class Post {
 	 * @return array List of post tags.
 	 */
 	public function get_terms( $taxonomy, $args = array() ) {
-		return wp_get_post_terms( $this->get_id(), $taxonomy, $args );
+		return array_map(
+			function( $term ) use ( $taxonomy ) {
+				try {
+					return Term::get_by_slug( $term['slug'], $taxonomy );
+				} catch ( Exception $e ) {
+					return null;
+				}
+			},
+			wp_get_post_terms( $this->get_id(), $taxonomy, $args )
+		);
 	}
 
 	/**
-	 * Set the terms for a post.
+	 * Add a single term to a post.
 	 *
-	 * @param string $tags     Optional. The tags to set for the post, separated by commas. Default empty.
-	 * @param string $taxonomy Optional. Taxonomy name. Default 'post_tag'.
-	 * @param bool   $append   Optional. If true, don't delete existing tags, just add on. If false,
-	 *                         replace the tags with the new tags. Default false.
-	 * @return mixed Array of affected term IDs. WP_Error or false on failure.
+	 * @param Term $terms Term Object
+	 * @return array|WP_Error Affected Term IDs.
 	 */
-	public function set_terms( $tags, $taxonomy, $append = false ) {
-		return wp_set_post_terms( $this->get_id(), $tags, $taxonomy, $append );
+	public function add_term( $term ) {
+		return wp_set_object_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy(), true );
 	}
 
-	public function has_term( $term = '', $taxonomy = '' ) {
-		return has_term( $term, $taxonomy, $this->get_id() );
+	/**
+	 * Bulk add terms to a post.
+	 *
+	 * @param string $taxonomy Taxonomy
+	 * @param array $terms Term objects
+	 */
+	public function add_terms( $taxonomy, $terms ) {
+
+		// Filter terms to ensure they are in the correct taxonomy
+		$terms = array_filter( $terms, function( $term ) use ( $taxonomy ) {
+			return $term->get_taxonomy() === $taxonomy;
+		} );
+
+		// get array of term IDs
+		$terms = array_map( function( $term ) {
+			return $term->get_id();
+		}, $terms );
+
+		return wp_set_object_terms( $this->get_id(), $terms, $taxonomy, true );
+	}
+
+	/**
+	 * Reset terms.
+	 * Will delete all terms for a given taxonomy.
+	 * Adds all passed terms or  overwrite existing terms,
+	 *
+	 * @param  array  $terms Term
+	 * @param  string  $terms Tax
+	 * @return array|WP_Error Affected Term IDs.
+	 */
+	public function reset_terms( $taxonomy, $terms = array() ) {
+
+		// Filter terms to ensure they are in the correct taxonomy
+		$terms = array_filter( $terms, function( $term ) use ( $taxonomy ) {
+			return $term->get_taxonomy() === $taxonomy;
+		} );
+
+		// get array of term IDs
+		$terms = array_map( function( $term ) {
+			return $term->get_id();
+		}, $terms );
+
+		return wp_set_object_terms( $this->get_id(), $terms, $taxonomy, false );
+
+	}
+
+	/**
+	 * Remove a post term.
+	 *
+	 * @param  Term $term.
+	 * @return bool|WP_Error True on success, false or WP_Error on failure.
+	 */
+	public function remove_term( $term ) {
+		return wp_remove_object_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy() );
+	}
+
+	/**
+	 * Is post associated with term?
+	 *
+	 * @param  Term $term
+	 * @return boolean
+	 */
+	public function has_term( $term ) {
+		return has_term( $term->get_slug(), $term->get_taxonomy(), $this->get_id() );
 	}
 
 }
