@@ -261,17 +261,6 @@ class Post {
 	}
 
 	/**
-	 * Add terms to a post.
-	 *
-	 * @param array $terms Term objects
-	 */
-	public function add_terms( $terms ) {
-		foreach ( $terms as $term ) {
-			$this->add_term( $term );
-		}
-	}
-
-	/**
 	 * Add a single term to a post.
 	 *
 	 * @param Term $terms Term Object
@@ -279,6 +268,27 @@ class Post {
 	 */
 	public function add_term( $term ) {
 		return wp_set_object_terms( $this->get_id(), $term->get_id(), $term->get_taxonomy(), true );
+	}
+
+	/**
+	 * Bulk add terms to a post.
+	 *
+	 * @param string $taxonomy Taxonomy
+	 * @param array $terms Term objects
+	 */
+	public function add_terms( $taxonomy, $terms ) {
+
+		// Filter terms to ensure they are in the correct taxonomy
+		$terms = array_filter( $terms, function( $term ) use ( $taxonomy ) {
+			return $term->get_taxonomy() === $taxonomy;
+		} );
+
+		// get array of term IDs
+		$terms = array_map( function( $term ) {
+			return $term->get_id();
+		}, $terms );
+
+		return wp_set_object_terms( $this->get_id(), $terms, $taxonomy, true );
 	}
 
 	/**
