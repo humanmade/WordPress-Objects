@@ -3,6 +3,7 @@
 class Post {
 
 	public $_post;
+	protected static $posts;
 
 	/**
 	 * @param int $post_id
@@ -23,6 +24,21 @@ class Post {
 
 		if ( in_array( $name, array( 'post_name', 'post_title', 'ID', 'post_author', 'post_type', 'post_status'  ) ) )
 			throw new Exception( 'Trying to access wp_post object properties from Post object' );
+	}
+
+	public static function get( $id ) {
+		if ( ! isset( static::$posts[$id] ) ) {
+			$class = get_called_class();
+
+			try {
+				static::$posts[$id] = new $class( $id );	
+			} catch ( Exception $e ) {
+				static::$posts[$id] = null;
+			}
+			
+		}
+
+		return static::$posts[$id];
 	}
 
 	public function _refresh_data() {
