@@ -2,8 +2,8 @@
 
 class User {
 
-	private static $_current_user;
-	private static $users;
+	protected static $_current_user;
+	protected static $users;
 
 	/**
 	 * Get the current loged in user
@@ -14,7 +14,7 @@ class User {
 	public static function current_user() {
 
 		if ( is_user_logged_in() )
-			return self::get( get_current_user_id() );
+			return static::get( get_current_user_id() );
 
 		else
 			throw new Exception( 'User is not logged in' );
@@ -22,12 +22,12 @@ class User {
 
 
 	public static function get( $id ) {
-		if ( ! isset( self::$users[$id] ) ) {
+		if ( ! isset( static::$users[$id] ) ) {
 			$class = get_called_class();
-			self::$users[$id] = new $class( $id );
+			static::$users[$id] = new $class( $id );
 		}
 
-		return self::$users[$id];
+		return static::$users[$id];
 	} 
 
 	/**
