@@ -31,11 +31,11 @@ class Post {
 			$class = get_called_class();
 
 			try {
-				static::$posts[$id] = new $class( $id );	
+				static::$posts[$id] = new $class( $id );
 			} catch ( Exception $e ) {
 				static::$posts[$id] = null;
 			}
-			
+
 		}
 
 		return static::$posts[$id];
@@ -267,7 +267,7 @@ class Post {
 		return array_map(
 			function( $term ) use ( $taxonomy ) {
 				try {
-					return Term::get_by_slug( $term['slug'], $taxonomy );
+					return Term::get_by_slug( $term->slug, $taxonomy );
 				} catch ( Exception $e ) {
 					return null;
 				}
