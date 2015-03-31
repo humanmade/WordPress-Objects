@@ -4,13 +4,20 @@ class Taxonomy {
 
 	protected $_tax;
 
+	public function __construct( $taxonomy ) {
+		$this->_tax = $taxonomy;
+	}
+
 	public static function get( $taxonomy ) {
 
-		$this->_tax = get_taxonomy( $taxonomy );
+		$taxonomy = get_taxonomy( $taxonomy );
 
-		if ( ! $this->_tax ) {
+		if ( ! $taxonomy ) {
 			return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy' ) );
 		}
+
+		$class = get_called_class();
+		return new $class( $taxonomy );
 
 	}
 
