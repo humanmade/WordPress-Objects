@@ -4,11 +4,14 @@ class Taxonomy {
 
 	protected $_tax;
 
-	public function get( $taxonomy ) {
+	public static function get( $taxonomy ) {
+
 		$this->_tax = get_taxonomy( $taxonomy );
+
 		if ( ! $this->_tax ) {
-			throw new Exception( 'Taxonomy not found' );
+			return new WP_Error( 'invalid_taxonomy', __( 'Invalid Taxonomy' ) );
 		}
+
 	}
 
 	public function get_name() {
