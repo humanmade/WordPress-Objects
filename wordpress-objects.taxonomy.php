@@ -2,15 +2,7 @@
 
 class Taxonomy {
 
-	static $taxonomy;
-
 	protected $_tax;
-
-	public function __construct() {
-		if ( static::$taxonomy ) {
-			$this->_tax = get_taxonomy( static::$taxonomy );
-		}
-	}
 
 	public function get( $taxonomy ) {
 		$this->_tax = get_taxonomy( $taxonomy );
@@ -36,7 +28,5 @@ class Taxonomy {
 			return new Term( $term->term_id, $term->taxonomy );
 		}, (array) get_terms( $this->get_name(), $args ) );
 	}
-}
-et_name(), $args ) );
-	}
+
 }
