@@ -26,6 +26,12 @@ class Post {
 			throw new Exception( 'Trying to access wp_post object properties from Post object' );
 	}
 
+	/**
+	 * Get a post
+	 * 
+	 * @param  int $id
+	 * @return Post|null if not exists
+	 */
 	public static function get( $id ) {
 		if ( ! isset( static::$posts[$id] ) ) {
 			$class = get_called_class();
@@ -39,6 +45,35 @@ class Post {
 		}
 
 		return static::$posts[$id];
+	}
+
+	/**
+	 * Get many posts from a query
+	 * 
+	 * @param  array $args
+	 * @return Post[]
+	 */
+	public static function get_many( $args ) {
+		$args['post_type']     = static::$post_type;
+		$args['no_found_rows'] = true;
+
+		$query = new \WP_Query( $args );
+
+		return array_map( function( $post ) {
+			return new static( $post );
+		}, $query->posts );
+	}
+
+	/**
+	 * Get an post from args
+	 * 
+	 * @param  array $args
+	 * @return Post
+	 */
+	public static function get_one( $args ) {
+		$args['posts_per_page'] = 1;
+
+		return array_shift( ( static::get_many( $args ) ) );
 	}
 
 	public function _refresh_data() {
