@@ -59,8 +59,16 @@ class Post {
 
 		$query = new \WP_Query( $args );
 
-		return array_map( function( $post ) {
-			return new static( $post );
+		$class = get_called_class();
+
+		/**
+		 * PHP binds the closure to the "self" class, not "static", so
+		 * "static" refers to the "self" inside the closure which isn't
+		 * what we want.
+		 */
+		return array_map( function( $post ) use ( $class ) {
+
+			return $class::get( $post->ID );
 		}, $query->posts );
 	}
 
