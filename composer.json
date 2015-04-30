@@ -1,0 +1,13 @@
+{
+  "name": "humanmade/wordpress_objects",
+  "description": "Some classes for WordPress to have real OO objects for WordPress data types",
+  "minimum-stability": "dev",
+  "license": "GPL-3.0",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "Human Made Limited",
+      "email": "hello@hmn.md"
+    }
+  ]
+}
