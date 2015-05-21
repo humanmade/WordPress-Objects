@@ -308,9 +308,17 @@ class Post {
 	 */
 	public function get_terms( $taxonomy, $args = array() ) {
 		return array_map(
-			function( $term ) use ( $taxonomy ) {
+			function( $term ) use ( $taxonomy, $args ) {
 				try {
-					return Term::get_by_slug( $term->slug, $taxonomy );
+					if ( isset( $args['fields'] ) ) {
+						if ( $args['fields'] === 'ids' ) {
+							return Term::get_by_id( $term, $taxonomy );
+						}
+						if ( $args['fields'] === 'names' ) {
+							return Term::get_by_name( $term, $taxonomy );
+						}
+					}
+					return Term::get_by_id( $term->term_id, $taxonomy );
 				} catch ( Exception $e ) {
 					return null;
 				}

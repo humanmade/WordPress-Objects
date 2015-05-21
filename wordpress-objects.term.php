@@ -11,9 +11,9 @@ class Term {
 	protected static $taxonomy = null;
 
 
-	public static function get_by_name( $slug, $taxonomy = null ) {
+	public static function get_by_name( $name, $taxonomy = null ) {
 
-		$term = get_term_by( 'name', $slug, $taxonomy ? $taxonomy : static::$taxonomy );
+		$term = get_term_by( 'name', $name, $taxonomy ? $taxonomy : static::$taxonomy );
 
 		$class = get_called_class();
 
@@ -23,6 +23,15 @@ class Term {
 	public static function get_by_slug( $slug, $taxonomy = null ) {
 
 		$term = get_term_by( 'slug', $slug, $taxonomy ? $taxonomy : static::$taxonomy );
+
+		$class = get_called_class();
+
+		return new $class( $term->term_id, $taxonomy ? $taxonomy : static::$taxonomy );
+	}
+
+	public static function get_by_id( $term_id, $taxonomy = null ) {
+
+		$term = get_term_by( 'id', $term_id, $taxonomy ? $taxonomy : static::$taxonomy );
 
 		$class = get_called_class();
 
