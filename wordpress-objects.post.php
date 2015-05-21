@@ -3,6 +3,7 @@
 class Post {
 
 	public $_post;
+	
 	protected static $posts;
 
 	/**
@@ -11,45 +12,48 @@ class Post {
 	 */
 	public function __construct( $post_id ) {
 
-		if ( empty( $post_id ) )
+		if ( empty( $post_id ) ) {
 			throw new Exception( '$post_id empty' );
+		}
 
 		$this->_post = get_post( $post_id );
 
-		if ( ! $this->_post )
+		if ( ! $this->_post ) {
 			throw new Exception( 'Post not found' );
+		}
 	}
 
 	public function __get( $name ) {
 
-		if ( in_array( $name, array( 'post_name', 'post_title', 'ID', 'post_author', 'post_type', 'post_status'  ) ) )
+		if ( in_array( $name, array( 'post_name', 'post_title', 'ID', 'post_author', 'post_type', 'post_status' ) ) ) {
 			throw new Exception( 'Trying to access wp_post object properties from Post object' );
+		}
 	}
 
 	/**
 	 * Get a post
-	 * 
+	 *
 	 * @param  int $id
 	 * @return Post|null if not exists
 	 */
 	public static function get( $id ) {
-		if ( ! isset( static::$posts[$id] ) ) {
+		if ( ! isset( static::$posts[ $id ] ) ) {
 			$class = get_called_class();
 
 			try {
-				static::$posts[$id] = new $class( $id );
+				static::$posts[ $id ] = new $class( $id );
 			} catch ( Exception $e ) {
-				static::$posts[$id] = null;
+				static::$posts[ $id ] = null;
 			}
 
 		}
 
-		return static::$posts[$id];
+		return static::$posts[ $id ];
 	}
 
 	/**
 	 * Get many posts from a query
-	 * 
+	 *
 	 * @param  array $args
 	 * @return Post[]
 	 */
@@ -74,7 +78,7 @@ class Post {
 
 	/**
 	 * Get an post from args
-	 * 
+	 *
 	 * @param  array $args
 	 * @return Post
 	 */
@@ -103,14 +107,16 @@ class Post {
 	 */
 	public function get_parent() {
 
-		if ( $this->_post->post_parent )
+		if ( $this->_post->post_parent ) {
 			return new Post( $this->_post->post_parent );
+		}
 
 		return null;
 	}
 
 	/**
 	 * Get the children of the post (if any)
+	 *
 	 * @return StdClass[]
 	 */
 	public function get_children() {
@@ -164,6 +170,7 @@ class Post {
 
 	/**
 	 * Set the post date of the post
+	 *
 	 * @param int $time PHP timestamp
 	 */
 	public function set_date( $time ) {
@@ -233,8 +240,9 @@ class Post {
 
 	public function get_author() {
 
-		if ( $this->_post->post_author )
+		if ( $this->_post->post_author ) {
 			return User::get( $this->_post->post_author );
+		}
 
 		return null;
 	}
@@ -286,15 +294,17 @@ class Post {
 	 */
 	public function add_comment( $comment_text, $user_id ) {
 
-		if ( empty( $comment_text ) || empty( $user_id) )
+		if ( empty( $comment_text ) || empty( $user_id ) ) {
 			throw new Exception( 'Not enough data' );
+		}
 
 		$comment = array( 'comment_post_ID' => $this->get_id(), 'user_id' => $user_id, 'comment_content' => esc_attr( $comment_text ) );
 
 		$result = wp_insert_comment( $comment );
 
-		if ( ! is_numeric( $result ) )
+		if ( ! is_numeric( $result ) ) {
 			throw new Exception( 'wp_insert_post failed: ' . $result );
+		}
 
 		return $result;
 	}
@@ -310,7 +320,10 @@ class Post {
 		return array_map(
 			function( $term ) use ( $taxonomy ) {
 				try {
-					return Term::get_by_slug( $term->slug, $taxonomy );
+					if ( is_object( $term ) ) {
+						return Term::get_by_id( $term->term_id, $taxonomy );
+					}
+					return $term;
 				} catch ( Exception $e ) {
 					return null;
 				}
@@ -322,7 +335,7 @@ class Post {
 	/**
 	 * Add a single term to a post.
 	 *
-	 * @param Term $terms Term Object
+	 * @param Term $term Term Object
 	 * @return array|WP_Error Affected Term IDs.
 	 */
 	public function add_term( $term ) {
@@ -333,7 +346,8 @@ class Post {
 	 * Bulk add terms to a post.
 	 *
 	 * @param string $taxonomy Taxonomy
-	 * @param array $terms Term objects
+	 * @param array  $terms    Term objects
+	 * @return array
 	 */
 	public function add_terms( $taxonomy, $terms ) {
 
@@ -355,8 +369,8 @@ class Post {
 	 * Will delete all terms for a given taxonomy.
 	 * Adds all passed terms or  overwrite existing terms,
 	 *
-	 * @param  array  $terms Term
-	 * @param  string  $terms Tax
+	 * @param  array        $terms Term
+	 * @param  string|array $terms Tax
 	 * @return array|WP_Error Affected Term IDs.
 	 */
 	public function reset_terms( $taxonomy, $terms = array() ) {
@@ -378,7 +392,7 @@ class Post {
 	/**
 	 * Remove a post term.
 	 *
-	 * @param  Term $term.
+	 * @param  Term $term .
 	 * @return bool|WP_Error True on success, false or WP_Error on failure.
 	 */
 	public function remove_term( $term ) {
