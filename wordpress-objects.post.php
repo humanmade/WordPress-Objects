@@ -318,7 +318,7 @@ class Post {
 	 */
 	public function get_terms( $taxonomy, $args = array() ) {
 		return array_map(
-			function( $term ) use ( $taxonomy, $args ) {
+			function( $term ) use ( $taxonomy ) {
 				try {
 					if ( is_object( $term ) ) {
 						return Term::get_by_id( $term->term_id, $taxonomy );
