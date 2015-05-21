@@ -310,13 +310,8 @@ class Post {
 		return array_map(
 			function( $term ) use ( $taxonomy, $args ) {
 				try {
-					if ( isset( $args['fields'] ) ) {
-						if ( $args['fields'] === 'ids' ) {
-							return Term::get_by_id( $term, $taxonomy );
-						}
-						if ( $args['fields'] === 'names' ) {
-							return Term::get_by_name( $term, $taxonomy );
-						}
+					if ( isset( $args['fields'] ) && in_array( $args['fields'], array( 'ids', 'names' ) ) ) {
+						return $term;
 					}
 					return Term::get_by_id( $term->term_id, $taxonomy );
 				} catch ( Exception $e ) {
