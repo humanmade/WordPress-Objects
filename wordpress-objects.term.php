@@ -38,6 +38,29 @@ class Term {
 		return new $class( $term->term_id, $taxonomy ? $taxonomy : static::$taxonomy );
 	}
 
+	/**
+	 * Get many terms from a query
+	 *
+	 * @param  array $args
+	 * @return Term[]
+	 */
+	public static function get_many( $args = array() ) {
+
+		$args['fields'] = 'ids';
+		$terms = get_terms( static::$taxonomy, $args );
+
+		$class = get_called_class();
+
+		/**
+		 * PHP binds the closure to the "self" class, not "static", so
+		 * "static" refers to the "self" inside the closure which isn't
+		 * what we want.
+		 */
+		return array_map( function( $term_id ) use ( $class ) {
+			return $class::get_by_id( $term_id );
+		}, $terms );
+	}
+
 	public function __construct( $term_id, $taxonomy = null ) {
 		
 		$taxonomy = $taxonomy ? $taxonomy : static::$taxonomy;
