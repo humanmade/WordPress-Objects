@@ -1,47 +1,41 @@
 <?php
 
-class User {
+namespace WordPress_Objects;
+use WP_User;
 
-	protected static $_current_user;
-	protected static $users;
+class User extends Base {
+
+	/**
+	 * Get many users from a query
+	 *
+	 * @param  array $args
+	 * @return int[]
+	 */
+	protected static function get_many_ids( $args = array() ) {
+
+		$args['fields'] = 'ids';
+		$query = new \WP_User_Query;
+		$query->prepare_query( $args );
+		$query->query();
+		$ids = $query->results;
+
+		return array_map( 'absint', $ids );
+	}
 
 	/**
 	 * Get the current loged in user
 	 * @static
 	 * @return User
-	 * @throws Exception on not loggged in
 	 */
 	public static function current_user() {
 
-		if ( is_user_logged_in() )
+		if ( is_user_logged_in() ) {
 			return static::get( get_current_user_id() );
-
-		else
-			throw new Exception( 'User is not logged in' );
-	}
-
-
-	public static function get( $id ) {
-		if ( ! isset( static::$users[$id] ) ) {
-			$class = get_called_class();
-			static::$users[$id] = new $class( $id );
 		}
-
-		return static::$users[$id];
-	} 
-
-	/**
-	 * @param int $user_id
-	 */
-	public function __construct( $user_id ) {
-
-		if ( empty( $user_id ) )
-			throw new Exception( '$user_id empty' );
-
-		$this->_id = $user_id;
-
-		if ( ! $this->get_user() )
-			throw new Exception( '$user_id does not exist' );
+	}
+	
+	public function __construct( $id ) {
+		$this->_id = $id;
 	}
 
 	/**

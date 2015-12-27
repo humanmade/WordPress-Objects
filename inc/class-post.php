@@ -1,96 +1,43 @@
 <?php
 
-class Post {
+namespace WordPress_Objects;
+
+class Post extends Base {
 
 	public $_post;
-	
-	protected static $posts;
-
-	/**
-	 * @param int $post_id
-	 * @throws Exception
-	 */
-	public function __construct( $post_id ) {
-
-		if ( empty( $post_id ) ) {
-			throw new Exception( '$post_id empty' );
-		}
-
-		$this->_post = get_post( $post_id );
-
-		if ( ! $this->_post ) {
-			throw new Exception( 'Post not found' );
-		}
-	}
-
-	public function __get( $name ) {
-
-		if ( in_array( $name, array( 'post_name', 'post_title', 'ID', 'post_author', 'post_type', 'post_status' ) ) ) {
-			throw new Exception( 'Trying to access wp_post object properties from Post object' );
-		}
-	}
-
-	/**
-	 * Get a post
-	 *
-	 * @param  int $id
-	 * @return Post|null if not exists
-	 */
-	public static function get( $id ) {
-		if ( ! isset( static::$posts[ $id ] ) ) {
-			$class = get_called_class();
-
-			try {
-				static::$posts[ $id ] = new $class( $id );
-			} catch ( Exception $e ) {
-				static::$posts[ $id ] = null;
-			}
-
-		}
-
-		return static::$posts[ $id ];
-	}
 
 	/**
 	 * Get many posts from a query
 	 *
 	 * @param  array $args
-	 * @return Post[]
+	 * @return int[]
 	 */
-	public static function get_many( $args ) {
+	protected static function get_many_ids( $args ) {
 		$args['post_type']     = static::$post_type;
 		$args['no_found_rows'] = true;
+		$args['fields']        = 'ids';
 
 		$query = new \WP_Query( $args );
-
-		$class = get_called_class();
-
-		/**
-		 * PHP binds the closure to the "self" class, not "static", so
-		 * "static" refers to the "self" inside the closure which isn't
-		 * what we want.
-		 */
-		return array_map( function( $post ) use ( $class ) {
-
-			return $class::get( $post->ID );
-		}, $query->posts );
+		return array_map( 'absint', $query->posts );
 	}
 
 	/**
 	 * Get an post from args
 	 *
 	 * @param  array $args
-	 * @return Post
+	 * @return int
 	 */
-	public static function get_one( $args ) {
+	protected static function get_one_id( $args ) {
 		$args['posts_per_page'] = 1;
 
-		return array_shift( ( static::get_many( $args ) ) );
+		return array_shift( static::get_many_ids( $args ) );
 	}
 
-	public function _refresh_data() {
-		clean_post_cache( $this->_post->ID );
-		$this->_post = get_post( $this->_post->ID );
+	/**
+	 * @param int $post_id
+	 */
+	public function __construct( $post_id ) {
+		$this->_post = get_post( $post_id );
 	}
 
 	/**
