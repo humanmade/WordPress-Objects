@@ -33,7 +33,7 @@ class User extends Base {
 			return static::get( get_current_user_id() );
 		}
 	}
-	
+
 	public function __construct( $id ) {
 		$this->_id = $id;
 	}
@@ -71,7 +71,7 @@ class User extends Base {
 	 */
 	public function get_id() {
 
-		return $this->_id;
+		return (int) $this->_id;
 	}
 
 	/**
