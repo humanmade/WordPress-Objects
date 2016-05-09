@@ -62,9 +62,9 @@ class Term {
 	}
 
 	public function __construct( $term_id, $taxonomy = null ) {
-		
+
 		$taxonomy = $taxonomy ? $taxonomy : static::$taxonomy;
-		
+
 		if ( empty( $term_id ) || ! $taxonomy )
 			throw new Exception( '$term_id or $taxonomy empty' );
 
@@ -81,8 +81,8 @@ class Term {
 	}
 
 	/**
-	 * Check is this term was used in the global $wp_query 
-	 * 
+	 * Check is this term was used in the global $wp_query
+	 *
 	 * @return bool
 	 */
 	public function is_queried_object() {
