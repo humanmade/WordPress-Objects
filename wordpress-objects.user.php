@@ -24,24 +24,24 @@ class User {
 	public static function get( $id ) {
 		if ( ! isset( static::$users[$id] ) ) {
 			$class = get_called_class();
-			static::$users[$id] = new $class( $id );
+			$object = new $class( $id );
+
+			if ( ! $object->get_user() ) {
+				return null;
+			}
+
+			static::$users[$id] = $object;
 		}
 
 		return static::$users[$id];
-	} 
+	}
 
 	/**
 	 * @param int $user_id
 	 */
 	public function __construct( $user_id ) {
 
-		if ( empty( $user_id ) )
-			throw new Exception( '$user_id empty' );
-
 		$this->_id = $user_id;
-
-		if ( ! $this->get_user() )
-			throw new Exception( '$user_id does not exist' );
 	}
 
 	/**
