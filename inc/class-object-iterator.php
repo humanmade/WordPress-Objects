@@ -2,7 +2,7 @@
 
 namespace WordPress_Objects;
 
-class Object_Iterator implements \Iterator {
+class Object_Iterator implements \SeekableIterator, \Countable, \ArrayAccess {
 
 	protected $ids = array();
 	protected $position = 0;
@@ -13,6 +13,7 @@ class Object_Iterator implements \Iterator {
 		$this->class = $class;
 	}
 
+	// Iterator methods
 	public function rewind() {
 		$this->position = 0;
 	}
@@ -31,6 +32,36 @@ class Object_Iterator implements \Iterator {
 	}
 
 	public function valid() {
-		 return isset($this->ids[ $this->position ] );
+		 return isset( $this->ids[ $this->position ] );
+	}
+
+	public function count() {
+		return count( $this->ids );
+	}
+
+	// SeekableIterator methods
+	public function seek( $position ) {
+		$this->position = $position;
+	}
+
+	// ArrayAccess methods
+	public function offsetSet( $offset, $object ) {
+		if ( is_null( $offset ) ) {
+			$this->ids[] = $object->get_id();
+		} else {
+			$this->ids[ $offset ] = $object->get_id();
+		}
+	}
+
+	public function offsetExists( $offset ) {
+		return isset( $this->ids[ $offset ] );
+	}
+
+	public function offsetUnset( $offset ) {
+		unset( $this->ids[ $offset ] );
+	}
+
+	public function offsetGet( $offset ) {
+		return $class::get( $this->ids[ $offset ] );
 	}
 }
